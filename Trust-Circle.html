@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust Circle - Community Lending</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #059669;
+            --secondary: #0891B2;
+            --accent: #7C3AED;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --gray: #6B7280;
+            --light-gray: #E5E7EB;
+            --background: #F3F4F6;
+            --white: #FFFFFF;
+            --gradient: linear-gradient(135deg, #059669 0%, #0891B2 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-pill {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .container {
+            margin-top: 70px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .trust-score-display {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+        }
+
+        .trust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #FEF3C7;
+            color: #92400E;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            color: var(--gray);
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #ECFDF5;
+            color: var(--primary);
+        }
+
+        .menu-item .icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .action-card.borrow {
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+        }
+
+        .action-card.guarantee {
+            background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+        }
+
+        .action-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .action-icon.borrow-icon {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-icon.guarantee-icon {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .action-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-desc {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            color: var(--success);
+            margin-top: 0.25rem;
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        /* Content Cards */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.875rem;
+            background: var(--background);
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 0.875rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        tr:hover {
+            background: var(--background);
+        }
+
+        .status {
+            padding: 0.25rem 0.625rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status.active { background: #D1FAE5; color: #065F46; }
+        .status.pending { background: #FEF3C7; color: #92400E; }
+        .status.completed { background: #DBEAFE; color: #1E40AF; }
+        .status.late { background: #FEE2E2; color: #991B1B; }
+
+        .amount {
+            font-weight: 600;
+        }
+
+        .amount.positive { color: var(--success); }
+        .amount.negative { color: var(--danger); }
+
+        /* Guarantor Flow */
+        .flow-visual {
+            background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .flow-line {
+            position: absolute;
+            top: 30px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: var(--success);
+            z-index: 0;
+        }
+
+        .flow-step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .flow-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 0.75rem;
+        }
+
+        .flow-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .flow-desc {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        /* Guarantor Cards */
+        .guarantor-pool {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .guarantor-card {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .guarantor-card:hover {
+            border-color: var(--primary);
+        }
+
+        .guarantor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.125rem;
+        }
+
+        .guarantor-info {
+            flex: 1;
+        }
+
+        .guarantor-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .guarantor-meta {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .guarantor-pledge {
+            text-align: right;
+        }
+
+        .pledge-amount {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .pledge-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .guarantor-status {
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .guarantor-status.pledged {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .guarantor-status.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* Commission Breakdown */
+        .commission-box {
+            background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .commission-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .commission-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.625rem 0;
+            border-bottom: 1px dashed #A7F3D0;
+        }
+
+        .commission-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.125rem;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 2px solid var(--success);
+        }
+
+        /* History Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--light-gray);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -1.75rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--success);
+        }
+
+        .timeline-content {
+            background: var(--background);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Steps */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .step-dot.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step-dot.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-hint {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        /* Member Selection */
+        .member-grid {
+            display: grid;
+            gap: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .member-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .member-option:hover, .member-option.selected {
+            border-color: var(--primary);
+            background: #ECFDF5;
+        }
+
+        .member-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .member-check {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .member-option.selected .member-check {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Progress Bars */
+        .progress-section {
+            margin: 1.5rem 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 4000;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .flow-steps {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .flow-line {
+                display: none;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Owner Dashboard Special */
+        .owner-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .owner-card {
+            background: var(--gradient);
+            color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .owner-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .owner-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .owner-change {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">🤝 Trust Circle</div>
+        <div class="nav-stats">
+            <div class="stat-pill">👥 100 Members</div>
+            <div class="stat-pill">💰 KES 2.5M Circulated</div>
+            <div class="stat-pill">⭐ 98% Repayment</div>
+        </div>
+        <div class="user-menu">
+            <div class="avatar">JD</div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="dashboard">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="trust-score-display">
+                    <div class="score-circle">
+                        <div class="score-value">95</div>
+                        <div class="score-label">Trust Score</div>
+                    </div>
+                    <div class="trust-badge">⭐ Platinum Member</div>
+                    <p style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;">
+                        Higher score = lower interest rates
+                    </p>
+                </div>
+
+                <ul class="menu-list">
+                    <li class="menu-item active" onclick="showView('overview')">
+                        <span class="icon">📊</span> Overview
+                    </li>
+                    <li class="menu-item" onclick="showView('borrow')">
+                        <span class="icon">🏦</span> Borrow Money
+                    </li>
+                    <li class="menu-item" onclick="showView('guarantee')">
+                        <span class="icon">🛡️</span> Guarantee Others
+                    </li>
+                    <li class="menu-item" onclick="showView('history')">
+                        <span class="icon">📜</span> My History
+                    </li>
+                    <li class="menu-item" onclick="showView('network')">
+                        <span class="icon">👥</span> My Network
+                    </li>
+                    <li class="menu-item" onclick="showView('owner')">
+                        <span class="icon">💼</span> Owner Dashboard
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Panel -->
+            <div class="main-panel">
+                
+                <!-- OVERVIEW VIEW -->
+                <div id="overviewView">
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <div class="action-card borrow" onclick="openBorrowModal()">
+                            <div class="action-icon borrow-icon">🏦</div>
+                            <h3 class="action-title">Borrow Money</h3>
+                            <p class="action-desc">Get instant loan from 3 friends. No collateral needed, just trust.</p>
+                        </div>
+                        <div class="action-card guarantee" onclick="openGuaranteeModal()">
+                            <div class="action-icon guarantee-icon">🛡️</div>
+                            <h3 class="action-title">Guarantee Someone</h3>
+                            <p class="action-desc">Pledge your savings to help a friend and earn 5% commission.</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">My Savings</span>
+                                <span class="stat-icon">💰</span>
+                            </div>
+                            <div class="stat-value">KES 25,000</div>
+                            <div class="stat-change">Available to pledge</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Active Loans</span>
+                                <span class="stat-icon">🏦</span>
+                            </div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-change">KES 0 outstanding</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Guarantees Given</span>
+                                <span class="stat-icon">🛡️</span>
+                            </div>
+                            <div class="stat-value">2</div>
+                            <div class="stat-change">KES 6,000 pledged</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Commission Earned</span>
+                                <span class="stat-icon">📈</span>
+                            </div>
+                            <div class="stat-value">KES 340</div>
+                            <div class="stat-change">From 4 guarantees</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Activity</h3>
+                            <button class="btn btn-secondary">View All</button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Details</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Today</td>
+                                    <td>Commission</td>
+                                    <td>Earned from Jane's loan repayment</td>
+                                    <td class="amount positive">+KES 100</td>
+                                    <td><span class="status completed">Received</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Yesterday</td>
+                                    <td>Guarantee</td>
+                                    <td>Pledged for Peter Kamau</td>
+                                    <td class="amount negative">-KES 2,000</td>
+                                    <td><span class="status active">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td>3 days ago</td>
+                                    <td>Deposit</td>
+                                    <td>M-Pesa deposit</td>
+                                    <td class="amount positive">+KES 5,000</td>
+                                    <td><span class="status completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>1 week ago</td>
+                                    <td>Loan Repaid</td>
+                                    <td>Repaid loan to 3 guarantors</td>
+                                    <td class="amount negative">-KES 6,600</td>
+                                    <td><span class="status completed">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- BORROW VIEW -->
+                <div id="borrowView" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">How Borrowing Works</h3>
+                        </div>
+                        
+                        <div class="flow-visual">
+                            <div class="flow-steps">
+                                <div class="flow-line"></div>
+                                <div class="flow-step">
+                                    <div class="flow-icon">1️⃣</div>
+                                    <div class="flow-label">Request Loan</div>
+                                    <div class="flow-desc">Enter amount & purpose</div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-icon">2️⃣</div>
+                                    <div class="flow-label">Pick 3 Friends</div>
+                                    <div class="flow-desc">They pledge savings</div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-icon">3️⃣</div>
+                                    <div class="flow-label">Get Money</div>
+                                    <div class="flow-desc">Instant to M-Pesa</div>
+                                </div>
+                                <div class="flow-step">
+                                    <div class="flow-icon">4️⃣</div>
+                                    <div class="flow-label">Repay + 10%</div>
+                                    <div class="flow-desc">Friends earn 5%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%; padding: 1rem;" onclick="openBorrowModal()">
+                            Start Loan Application
+                        </button>
+                    </div>
+
+                    <!-- My Borrowing History -->
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">My Borrowing History</h3>
+                        </div>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">March 15, 2024</div>
+                                    <div class="timeline-title">Loan Fully Repaid</div>
+                                    <div class="timeline-desc">KES 6,600 repaid to 3 guarantors. Trust score increased by 5 points.</div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">February 15, 2024</div>
+                                    <div class="timeline-title">Loan Taken</div>
+                                    <div class="timeline-desc">Borrowed KES 6,000 from Jane, Peter, and Alice. Purpose: School fees.</div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">January 10, 2024</div>
+                                    <div class="timeline-title">First Loan Repaid</div>
+                                    <div class="timeline-desc">KES 3,300 repaid early. Earned "Reliable Borrower" badge.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GUARANTEE VIEW -->
+                <div id="guaranteeView" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">My Active Guarantees</h3>
+                        </div>
+
+                        <div class="guarantor-pool">
+                            <div class="guarantor-card">
+                                <div class="guarantor-avatar">JW</div>
+                                <div class="guarantor-info">
+                                    <div class="guarantor-name">Jane Wanjiku</div>
+                                    <div class="guarantor-meta">Loan: KES 6,000 • Due: April 15</div>
+                                    <div style="font-size: 0.75rem; color: var(--success); margin-top: 0.25rem;">
+                                        ✓ Repayment on track
+                                    </div>
+                                </div>
+                                <div class="guarantor-pledge">
+                                    <div class="pledge-amount">KES 2,000</div>
+                                    <div class="pledge-label">Your pledge</div>
+                                    <div style="font-size: 0.75rem; color: var(--success); margin-top: 0.25rem;">
+                                        Earn KES 100
+                                    </div>
+                                </div>
+                                <span class="guarantor-status pledged">Active</span>
+                            </div>
+
+                            <div class="guarantor-card">
+                                <div class="guarantor-avatar">PK</div>
+                                <div class="guarantor-info">
+                                    <div class="guarantor-name">Peter Kamau</div>
+                                    <div class="guarantor-meta">Loan: KES 6,000 • Due: April 20</div>
+                                    <div style="font-size: 0.75rem; color: var(--warning); margin-top: 0.25rem;">
+                                        ⏰ 5 days remaining
+                                    </div>
+                                </div>
+                                <div class="guarantor-pledge">
+                                    <div class="pledge-amount">KES 2,000</div>
+                                    <div class="pledge-label">Your pledge</div>
+                                    <div style="font-size: 0.75rem; color: var(--success); margin-top: 0.25rem;">
+                                        Earn KES 100
+                                    </div>
+                                </div>
+                                <span class="guarantor-status pledged">Active</span>
+                            </div>
+                        </div>
+
+                        <div class="commission-box">
+                            <div class="commission-title">
+                                💰 Commission Structure
+                            </div>
+                            <div class="commission-row">
+                                <span>Your Pledge</span>
+                                <span>KES 2,000</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>Interest from Borrower (10%)</span>
+                                <span>KES 600</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>Your Commission (5% of loan)</span>
+                                <span class="amount positive">+KES 100</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>Platform Fee (3%)</span>
+                                <span>KES 60</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>You Receive Back</span>
+                                <span>KES 2,100</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guarantee Requests -->
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Pending Guarantee Requests</h3>
+                        </div>
+
+                        <div class="guarantor-card" style="background: #FEF3C7;">
+                            <div class="guarantor-avatar" style="background: var(--warning);">DO</div>
+                            <div class="guarantor-info">
+                                <div class="guarantor-name">David Ochieng</div>
+                                <div class="guarantor-meta">Needs KES 6,000 • Wants you as guarantor</div>
+                                <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.25rem;">
+                                    Purpose: Business investment • Repayment: 30 days
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-success" onclick="approveGuarantee()">Approve (KES 2,000)</button>
+                                <button class="btn btn-secondary">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HISTORY VIEW -->
+                <div id="historyView" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Complete Transaction History</h3>
+                        </div>
+                        
+                        <div class="stats-grid" style="margin-bottom: 1.5rem;">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Borrowed</div>
+                                <div class="stat-value">KES 15,000</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Total Repaid</div>
+                                <div class="stat-value">KES 16,500</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Guarantees Given</div>
+                                <div class="stat-value">KES 8,000</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Commission Earned</div>
+                                <div class="stat-value">KES 340</div>
+                            </div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Person</th>
+                                    <th>Amount</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15 Mar 2024</td>
+                                    <td><span class="status completed">Repayment</span></td>
+                                    <td>To 3 guarantors</td>
+                                    <td class="amount negative">-KES 6,600</td>
+                                    <td>KES 19,400</td>
+                                </tr>
+                                <tr>
+                                    <td>15 Mar 2024</td>
+                                    <td><span class="status completed">Commission</span></td>
+                                    <td>From Peter's loan</td>
+                                    <td class="amount positive">+KES 100</td>
+                                    <td>KES 26,000</td>
+                                </tr>
+                                <tr>
+                                    <td>14 Feb 2024</td>
+                                    <td><span class="status active">Loan Taken</span></td>
+                                    <td>From 3 guarantors</td>
+                                    <td class="amount positive">+KES 6,000</td>
+                                    <td>KES 25,900</td>
+                                </tr>
+                                <tr>
+                                    <td>14 Feb 2024</td>
+                                    <td><span class="status active">Guarantee</span></td>
+                                    <td>For Jane Wanjiku</td>
+                                    <td class="amount negative">-KES 2,000</td>
+                                    <td>KES 19,900</td>
+                                </tr>
+                                <tr>
+                                    <td>10 Jan 2024</td>
+                                    <td><span class="status completed">Repayment</span></td>
+                                    <td>To 2 guarantors</td>
+                                    <td class="amount negative">-KES 3,300</td>
+                                    <td>KES 21,900</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- NETWORK VIEW -->
+                <div id="networkView" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">My Trust Network (12 people)</h3>
+                            <button class="btn btn-primary">+ Invite Friend</button>
+                        </div>
+
+                        <div class="member-grid">
+                            <div class="member-option">
+                                <div class="guarantor-avatar">JW</div>
+                                <div class="guarantor-info">
+                                    <div class="guarantor-name">Jane Wanjiku</div>
+                                    <div class="guarantor-meta">Guaranteed you 2x • Trust Score: 98</div>
+                                </div>
+                                <span style="color: var(--success); font-size: 0.875rem;">Trusted</span>
+                            </div>
+                            <div class="member-option">
+                                <div class="guarantor-avatar">PK</div>
+                                <div class="guarantor-info">
+                                    <div class="guarantor-name">Peter Kamau</div>
+                                    <div class="guarantor-meta">You guaranteed 1x • Trust Score: 85</div>
+                                </div>
+                                <span style="color: var(--success); font-size: 0.875rem;">Trusted</span>
+                            </div>
+                            <div class="member-option">
+                                <div class="guarantor-avatar">AM</div>
+                                <div class="guarantor-info">
+                                    <div class="guarantor-name">Alice Mwende</div>
+                                    <div class="guarantor-meta">No history yet • Trust Score: 72</div>
+                                </div>
+                                <span style="color: var(--gray); font-size: 0.875rem;">New</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OWNER DASHBOARD -->
+                <div id="ownerView" style="display: none;">
+                    <div class="owner-stats">
+                        <div class="owner-card">
+                            <div class="owner-label">Platform Revenue (This Month)</div>
+                            <div class="owner-value">KES 18,450</div>
+                            <div class="owner-change">From 105 loans processed</div>
+                        </div>
+                        <div class="owner-card">
+                            <div class="owner-label">Active Loans</div>
+                            <div class="owner-value">87</div>
+                            <div class="owner-change">KES 524,000 total value</div>
+                        </div>
+                        <div class="owner-card">
+                            <div class="owner-label">Default Rate</div>
+                            <div class="owner-value">2.1%</div>
+                            <div class="owner-change">Industry average: 5%</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Revenue Breakdown</h3>
+                        </div>
+
+                        <div class="commission-box" style="margin-bottom: 1.5rem;">
+                            <div class="commission-title">How You Make Money (Per KES 6,000 Loan)</div>
+                            <div class="commission-row">
+                                <span>Loan Amount</span>
+                                <span>KES 6,000</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>Interest Charged (10%)</span>
+                                <span>KES 600</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>To 3 Guarantors (5% each)</span>
+                                <span>-KES 300</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>Insurance/Default Fund (2%)</span>
+                                <span>-KES 120</span>
+                            </div>
+                            <div class="commission-row">
+                                <span>M-Pesa Transaction Fees</span>
+                                <span>-KES 60</span>
+                            </div>
+                            <div class="commission-row">
+                                <span style="color: var(--primary); font-weight: bold;">YOUR PLATFORM FEE (3%)</span>
+                                <span style="color: var(--primary); font-weight: bold;">KES 120</span>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Avg. Loan Size</div>
+                                <div class="stat-value">KES 6,024</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Platform Fee/Loan</div>
+                                <div class="stat-value">KES 175</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Monthly Volume</div>
+                                <div class="stat-value">105 loans</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Projected Annual</div>
+                                <div class="stat-value">KES 220K</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #ECFDF5; padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem;">
+                            <h4 style="color: var(--primary); margin-bottom: 1rem;">Scaling Projections</h4>
+                            <table style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Members</th>
+                                        <th>Monthly Loans</th>
+                                        <th>Your Revenue</th>
+                                        <th>Annual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>100 (now)</td>
+                                        <td>105</td>
+                                        <td>KES 18,450</td>
+                                        <td>KES 221,400</td>
+                                    </tr>
+                                    <tr>
+                                        <td>500</td>
+                                        <td>525</td>
+                                        <td>KES 92,250</td>
+                                        <td>KES 1.1M</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1,000</td>
+                                        <td>1,050</td>
+                                        <td>KES 184,500</td>
+                                        <td>KES 2.2M</td>
+                                    </tr>
+                                    <tr style="background: #D1FAE5; font-weight: bold;">
+                                        <td>5,000</td>
+                                        <td>5,250</td>
+                                        <td>KES 922,500</td>
+                                        <td>KES 11M</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Risk Management -->
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Risk Management</h3>
+                        </div>
+
+                        <div class="progress-section">
+                            <div class="progress-label">
+                                <span>Default Reserve Fund</span>
+                                <span>KES 45,200 (8.6% of loan book)</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 86%;"></div>
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;">
+                                Target: 10% of total loans. Built from 2% of every loan.
+                            </div>
+                        </div>
+
+                        <div class="stats-grid" style="margin-top: 1.5rem;">
+                            <div class="stat-card">
+                                <div class="stat-label">Late Payments</div>
+                                <div class="stat-value">3</div>
+                                <div class="stat-change negative">Need follow-up</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Defaults (90+ days)</div>
+                                <div class="stat-value">1</div>
+                                <div class="stat-change">Covered by reserve</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Avg. Repayment Time</div>
+                                <div class="stat-value">28 days</div>
+                                <div class="stat-change">2 days early</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Member Growth</div>
+                                <div class="stat-value">+12%</div>
+                                <div class="stat-change">This month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- BORROW MODAL -->
+    <div class="modal" id="borrowModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">Apply for Loan</h3>
+                <button class="close-btn" onclick="closeModal('borrowModal')">×</button>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step-dot active" id="dot1">1</div>
+                <div class="step-dot" id="dot2">2</div>
+                <div class="step-dot" id="dot3">3</div>
+            </div>
+
+            <!-- Step 1: Amount -->
+            <div id="borrowStep1">
+                <div class="form-group">
+                    <label>How much do you need? (KES)</label>
+                    <input type="number" id="loanAmount" value="6000" min="1000" max="20000" onchange="updateLoanCalc()">
+                    <div class="input-hint">Max: KES 20,000 (based on your trust score)</div>
+                </div>
+
+                <div class="form-group">
+                    <label>What's it for?</label>
+                    <select>
+                        <option>Emergency/Medical</option>
+                        <option>School Fees</option>
+                        <option>Business/Investment</option>
+                        <option>Home/Rent</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Repayment Date</label>
+                    <input type="date" value="2024-04-15">
+                    <div class="input-hint">30 days recommended for lowest rate</div>
+                </div>
+
+                <div class="commission-box">
+                    <div class="commission-title">Loan Cost Breakdown</div>
+                    <div class="commission-row">
+                        <span>You Receive</span>
+                        <span id="calcReceive">KES 6,000</span>
+                    </div>
+                    <div class="commission-row">
+                        <span>You Repay (10% interest)</span>
+                        <span id="calcRepay">KES 6,600</span>
+                    </div>
+                    <div class="commission-row">
+                        <span>Each Guarantor Earns (5%)</span>
+                        <span id="calcGuarantor">KES 100</span>
+                    </div>
+                    <div class="commission-row">
+                        <span>Platform Fee (3%)</span>
+                        <span id="calcPlatform">KES 180</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="nextBorrowStep(2)">
+                    Continue to Select Guarantors
+                </button>
+            </div>
+
+            <!-- Step 2: Select Guarantors -->
+            <div id="borrowStep2" style="display: none;">
+                <div style="background: #FEF3C7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <strong>Select 3 Guarantors</strong>
+                    <p style="font-size: 0.875rem; color: var(--gray); margin-top: 0.5rem;">
+                        Each will pledge KES 2,000. They must approve within 24 hours.
+                    </p>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>Guarantee Pledged</span>
+                        <span id="pledgeProgress">KES 0 / KES 6,000</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="pledgeBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="member-grid">
+                    <div class="member-option" onclick="toggleGuarantor(this, 'JW', 'Jane Wanjiku')">
+                        <div class="guarantor-avatar">JW</div>
+                        <div class="guarantor-info">
+                            <div class="guarantor-name">Jane Wanjiku</div>
+                            <div class="guarantor-meta">Trust Score: 98 • Available: KES 15,000</div>
+                        </div>
+                        <div class="member-check">✓</div>
+                    </div>
+                    <div class="member-option" onclick="toggleGuarantor(this, 'PK', 'Peter Kamau')">
+                        <div class="guarantor-avatar">PK</div>
+                        <div class="guarantor-info">
+                            <div class="guarantor-name">Peter Kamau</div>
+                            <div class="guarantor-meta">Trust Score: 85 • Available: KES 8,000</div>
+                        </div>
+                        <div class="member-check">✓</div>
+                    </div>
+                    <div class="member-option" onclick="toggleGuarantor(this, 'AM', 'Alice Mwende')">
+                        <div class="guarantor-avatar">AM</div>
+                        <div class="guarantor-info">
+                            <div class="guarantor-name">Alice Mwende</div>
+                            <div class="guarantor-meta">Trust Score: 72 • Available: KES 12,000</div>
+                        </div>
+                        <div class="member-check">✓</div>
+                    </div>
+                    <div class="member-option disabled">
+                        <div class="guarantor-avatar" style="background: var(--gray);">SM</div>
+                        <div class="guarantor-info">
+                            <div class="guarantor-name">Sarah Muthoni</div>
+                            <div class="guarantor-meta">Trust Score: 45 • Low availability</div>
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--gray);">Unavailable</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" style="flex: 1;" onclick="nextBorrowStep(1)">Back</button>
+                    <button class="btn btn-primary" style="flex: 1;" onclick="nextBorrowStep(3)" id="continueBtn" disabled>
+                        Continue
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirm -->
+            <div id="borrowStep3" style="display: none;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+                    <h3>Ready to Submit</h3>
+                    <p style="color: var(--gray);">Your guarantors will be notified instantly</p>
+                </div>
+
+                <div class="commission-box" style="margin-bottom: 1.5rem;">
+                    <div class="commission-row">
+                        <span>Loan Amount</span>
+                        <span>KES 6,000</span>
+                    </div>
+                    <div class="commission-row">
+                        <span>3 Guarantors</span>
+                        <span>Jane, Peter, Alice</span>
+                    </div>
+                    <div class="commission-row">
+                        <span>Each Pledges</span>
+                        <span>KES 2,000</span>
+                    </div>
+                    <div class="commission-row">
+                        <span>You Repay in 30 days</span>
+                        <span>KES 6,600</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" required>
+                        I agree to repay KES 6,600 within 30 days. I understand my guarantors will lose their money if I don't pay.
+                    </label>
+                </div>
+
+                <button class="btn btn-success" style="width: 100%;" onclick="submitLoan()">
+                    Send Requests to 3 Guarantors
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GUARANTEE APPROVAL MODAL -->
+    <div class="modal" id="guaranteeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Guarantee Loan Request</h3>
+                <button class="close-btn" onclick="closeModal('guaranteeModal')">×</button>
+            </div>
+
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <div class="guarantor-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1rem;">DO</div>
+                <h3>David Ochieng</h3>
+                <p style="color: var(--gray);">Wants to borrow KES 6,000</p>
+            </div>
+
+            <div class="commission-box" style="margin-bottom: 1.5rem;">
+                <div class="commission-row">
+                    <span>Your Pledge</span>
+                    <span>KES 2,000</span>
+                </div>
+                <div class="commission-row">
+                    <span>Locked for</span>
+                    <span>30 days</span>
+                </div>
+                <div class="commission-row">
+                    <span>You Earn (5%)</span>
+                    <span class="amount positive">KES 100</span>
+                </div>
+                <div class="commission-row">
+                    <span>Risk if they default</span>
+                    <span class="amount negative">Lose KES 2,000</span>
+                </div>
+            </div>
+
+            <div style="background: #FEF3C7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong>David's Trust History</strong>
+                <ul style="font-size: 0.875rem; color: var(--gray); margin-top: 0.5rem; margin-left: 1rem;">
+                    <li>Trust Score: 78 (Good)</li>
+                    <li>Previous loans: 3</li>
+                    <li>Repayment rate: 100%</li>
+                    <li>Never defaulted</li>
+                </ul>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal('guaranteeModal')">Decline</button>
+                <button class="btn btn-success" style="flex: 1;" onclick="approveGuarantee()">
+                    Approve & Pledge KES 2,000
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // State
+        let selectedGuarantors = [];
+        let currentBorrowStep = 1;
+
+        // View Switching
+        function showView(view) {
+            const views = ['overview', 'borrow', 'guarantee', 'history', 'network', 'owner'];
+            views.forEach(v => document.getElementById(v + 'View').style.display = 'none');
+            document.getElementById(view + 'View').style.display = 'block';
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.menu-item').classList.add('active');
+        }
+
+        // Modal Functions
+        function openBorrowModal() {
+            document.getElementById('borrowModal').classList.add('active');
+            resetBorrowSteps();
+        }
+
+        function openGuaranteeModal() {
+            document.getElementById('guaranteeModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Loan Calculator
+        function updateLoanCalc() {
+            const amount = parseInt(document.getElementById('loanAmount').value) || 6000;
+            const interest = amount * 0.10;
+            const repay = amount + interest;
+            const perGuarantor = amount / 3;
+            const guarantorEarn = perGuarantor * 0.05;
+            const platformFee = amount * 0.03;
+
+            document.getElementById('calcReceive').textContent = 'KES ' + amount.toLocaleString();
+            document.getElementById('calcRepay').textContent = 'KES ' + repay.toLocaleString();
+            document.getElementById('calcGuarantor').textContent = 'KES ' + Math.floor(guarantorEarn).toLocaleString();
+            document.getElementById('calcPlatform').textContent = 'KES ' + Math.floor(platformFee).toLocaleString();
+        }
+
+        // Borrow Steps
+        function nextBorrowStep(step) {
+            document.getElementById('borrowStep1').style.display = 'none';
+            document.getElementById('borrowStep2').style.display = 'none';
+            document.getElementById('borrowStep3').style.display = 'none';
+
+            document.getElementById('borrowStep' + step).style.display = 'block';
+
+            // Update dots
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('dot' + i);
+                dot.classList.remove('active', 'completed');
+                if (i < step) dot.classList.add('completed');
+                if (i === step) dot.classList.add('active');
+            }
+
+            currentBorrowStep = step;
+        }
+
+        function resetBorrowSteps() {
+            selectedGuarantors = [];
+            updatePledgeProgress();
+            nextBorrowStep(1);
+            document.querySelectorAll('.member-option').forEach(el => {
+                el.classList.remove('selected');
+                if (!el.classList.contains('disabled')) {
+                    el.querySelector('.member-check').textContent = '✓';
+                }
+            });
+        }
+
+        // Guarantor Selection
+        function toggleGuarantor(element, code, name) {
+            if (element.classList.contains('disabled')) return;
+
+            const isSelected = element.classList.contains('selected');
+            
+            if (isSelected) {
+                element.classList.remove('selected');
+                selectedGuarantors = selectedGuarantors.filter(g => g.code !== code);
+            } else {
+                if (selectedGuarantors.length >= 3) {
+                    showNotification('You can only select 3 guarantors', 'error');
+                    return;
+                }
+                element.classList.add('selected');
+                selectedGuarantors.push({ code, name });
+            }
+
+            updatePledgeProgress();
+        }
+
+        function updatePledgeProgress() {
+            const pledgeAmount = selectedGuarantors.length * 2000;
+            const target = 6000;
+            const percent = (pledgeAmount / target) * 100;
+
+            document.getElementById('pledgeProgress').textContent = 
+                `KES ${pledgeAmount.toLocaleString()} / KES ${target.toLocaleString()}`;
+            document.getElementById('pledgeBar').style.width = percent + '%';
+
+            document.getElementById('continueBtn').disabled = selectedGuarantors.length !== 3;
+        }
+
+        // Submit Loan
+        function submitLoan() {
+            closeModal('borrowModal');
+            showNotification(`Requests sent to ${selectedGuarantors.length} guarantors!`, 'success');
+            
+            setTimeout(() => {
+                showNotification('Jane Wanjiku approved! Waiting for 2 more...', 'success');
+            }, 3000);
+
+            setTimeout(() => {
+                showNotification('🎉 All 3 approved! KES 6,000 sent to your M-Pesa.', 'success');
+            }, 6000);
+        }
+
+        // Approve Guarantee
+        function approveGuarantee() {
+            closeModal('guaranteeModal');
+            showNotification('✅ You pledged KES 2,000. You will earn KES 100 when repaid.', 'success');
+            
+            setTimeout(() => {
+                showNotification('💰 KES 2,000 locked until April 15, 2024', 'warning');
+            }, 2000);
+        }
+
+        // Notification
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = 'notification show';
+            if (type === 'error') notif.style.background = 'var(--danger)';
+            if (type === 'warning') notif.style.background = 'var(--warning)';
+            
+            setTimeout(() => notif.classList.remove('show'), 4000);
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLoanCalc();
+        });
+    </script>
+</body>
+</html>
